@@ -79,7 +79,7 @@ jobs:
           severity: info
           description: BART has been updated with new data. https://bart.nickorlow.com
           username: BART Bot
-          #avatarUrl: # optional
+          avatarUrl: https://raw.githubusercontent.com/nickorlow/bowling-data/main/.github/workflows/supp/bot-pfp.png
           
           
           
