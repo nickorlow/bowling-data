@@ -67,6 +67,7 @@ def print_game(date, game_num, full_data):
 
                 first_throw = row[frame_idx]
                 second_throw = row[frame_idx + 1]
+                print(bowler_name + " frame " + str(frame_number));
                 first_throw = score_of(first_throw)
                 if (first_throw == 10):
                     # Strike
