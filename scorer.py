@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy import stats
 from datetime import datetime
 
 
@@ -7,7 +8,6 @@ def next_throw(row, i):
     while (str(row[i]) == "nan"):
         i += 1
     return i
-
 
 def score_of(x):
     if (x == "F"):
@@ -21,6 +21,14 @@ def make_table(name, df, modifier):
     df = modifier(df)
     tablestr = "<table style=\"margin:5px;\">"
     tablestr += f"<tr><th colspan=\"{len(df.iloc[0])}\">{name}</th></tr>"
+    
+    if 'rank' in df.columns:
+        tablestr += "<tr><th>Rank</th><th>Bowler</th><th>Average</th><th>Confidence Interval</th><th>Lower Bound</th><th>Upper Bound</th></tr>"
+    else:
+        tablestr += "<tr>"
+        for col in df.columns:
+            tablestr += f"<th>{col}</th>"
+        tablestr += "</tr>"
 
     for i, row in df.iterrows():
         tablestr += f"<tr>"
@@ -137,13 +145,34 @@ def print_games_index(data):
 
     file.write("<div style=\"display: flex\">")
 
+def print_games_index(data):
+    file = open(f"index.html", "w")
+
+    file.write("<body>")
+    file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
+    file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
+
+    file.write("<div style=\"display: flex\">")
+
     def get_rankings(df):
         df_sorted = df.sort_values(by=['date', 'game_num'])
         dfg = df_sorted.groupby('bowler').tail(8)
-        res = dfg.groupby("bowler")["score"].mean().reset_index().sort_values(by='score', ascending=False).round(3)
-        return res
-
+        res = dfg.groupby("bowler")["score"].agg(['mean', 'sem']).reset_index()
+        res['ci'] = res['sem'].apply(lambda x: f"&plusmn; {stats.norm.ppf(0.975) * x:.2f}")
+        res['lower_bound'] = res.apply(lambda x: x['mean'] - float(x['ci'].split(" ")[1]), axis=1)
+        res['upper_bound'] = res.apply(lambda x: x['mean'] + float(x['ci'].split(" ")[1]), axis=1)
+        res['mean'] = res['mean'].round(3)
+        res['lower_bound'] = res['lower_bound'].round(3)
+        res['upper_bound'] = res['upper_bound'].round(3)
+        res = res.sort_values(by='mean', ascending=False)
+        
+        res['rank'] = range(1, len(res) + 1)
+        
+        res['rank'] = res['rank'].astype(int)
+        return res[['rank', 'bowler', 'mean', 'ci', 'lower_bound', 'upper_bound']]
+    
     file.write(make_table("Ranking (Avg score of last 8 games)", data, get_rankings))
+
 
     def get_highest_scores(df):
         highest_scores = df.groupby('bowler')['score'].max().reset_index()
@@ -163,6 +192,7 @@ def print_games_index(data):
     file.write("</div>")
 
     unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
+    file.write("<p><i>Confidence intervals calculated using the standard error of the mean and a 95% confidence level (z-score of 1.96).</i></p>")
     file.write("<h2>Game History</h2>")
     file.write("<div style=\"display: flex;\">")
     ld = ""
