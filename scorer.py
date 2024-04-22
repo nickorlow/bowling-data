@@ -48,6 +48,46 @@ def make_table(name, df, modifier):
     </style>"""
     return tablestr
 
+def count_wins(dataframe):
+    # Initialize a dictionary to store the count of wins for each bowler
+    wins_count = {}
+    
+    # Iterate over each row (game) in the dataframe
+    for index, row in dataframe.iterrows():
+        # Extract game information
+        bowler = row['bowler']
+        score = row['score']
+        date = row['date']
+        game_num = row['game_num']
+        
+        # Generate the game ID
+        game_id = f"{date}-{game_num}"
+        
+        # Check if the bowler already has a win count, if not, initialize to 0
+        if game_id not in wins_count:
+            wins_count[game_id] = {'bowler': None, 'score': 0} 
+        
+        # Check if the current score is higher than the highest score seen for this game
+        if game_id not in wins_count or score > wins_count[game_id]['score']:
+            # Update the highest score for this game
+            wins_count[game_id] = {'bowler': bowler, 'score': score}
+    
+    # Count the number of wins for each bowler
+    bowlers_wins = {} 
+
+    for bowler in dataframe['bowler'].unique():
+        print(bowler)
+        bowlers_wins[bowler] = 0
+
+    for game_id in wins_count:
+        info = wins_count[game_id]
+        winning_bowler = info['bowler']
+        bowlers_wins[winning_bowler] += 1
+
+    bw_df = pd.DataFrame(list(bowlers_wins.items()), columns=['bowler', 'wins']).sort_values(by=['wins'], ascending=0)
+
+    return bw_df
+
 def print_game(date, game_num, full_data):
     file = open(f"{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
     data = full_data[full_data['date'] == date]
@@ -186,8 +226,11 @@ def print_games_index(data):
 
     def get_spares(df):
         lowest_scores = df.groupby('bowler')['spare_cnt'].sum().astype(int).reset_index()
+        print(lowest_scores.head())
         return lowest_scores.sort_values(by='spare_cnt', ascending=False)
     file.write(make_table("Most Spares", data, get_spares))
+    
+    file.write(make_table("Most Wins", data, count_wins))
 
     file.write("</div>")
 
