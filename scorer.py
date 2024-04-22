@@ -49,31 +49,27 @@ def make_table(name, df, modifier):
     return tablestr
 
 def count_wins(dataframe):
-    # Initialize a dictionary to store the count of wins for each bowler
     wins_count = {}
     
-    # Iterate over each row (game) in the dataframe
     for index, row in dataframe.iterrows():
-        # Extract game information
         bowler = row['bowler']
         score = row['score']
         date = row['date']
         game_num = row['game_num']
         
-        # Generate the game ID
         game_id = f"{date}-{game_num}"
         
-        # Check if the bowler already has a win count, if not, initialize to 0
         if game_id not in wins_count:
-            wins_count[game_id] = {'bowler': None, 'score': 0} 
+            wins_count[game_id] = {'bowler': None, 'score': 0}
         
-        # Check if the current score is higher than the highest score seen for this game
-        if game_id not in wins_count or score > wins_count[game_id]['score']:
-            # Update the highest score for this game
-            wins_count[game_id] = {'bowler': bowler, 'score': score}
+        if game_id not in wins_count or score >= wins_count[game_id]['score']:
+            if (score == wins_count[game_id]['score']):
+                wins_count[game_id] = {'bowler': None, 'score': score}
+            else:
+                wins_count[game_id] = {'bowler': bowler, 'score': score}
+
     
-    # Count the number of wins for each bowler
-    bowlers_wins = {} 
+    bowlers_wins = {}
 
     for bowler in dataframe['bowler'].unique():
         print(bowler)
@@ -82,7 +78,8 @@ def count_wins(dataframe):
     for game_id in wins_count:
         info = wins_count[game_id]
         winning_bowler = info['bowler']
-        bowlers_wins[winning_bowler] += 1
+        if winning_bowler != None:
+            bowlers_wins[winning_bowler] += 1
 
     bw_df = pd.DataFrame(list(bowlers_wins.items()), columns=['bowler', 'wins']).sort_values(by=['wins'], ascending=0)
 
