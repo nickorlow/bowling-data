@@ -48,13 +48,14 @@ def make_table(name, df, modifier):
     </style>"""
     return tablestr
 
+
+wins_count = {}
 def count_wins(dataframe):
-    wins_count = {}
     
     for index, row in dataframe.iterrows():
         bowler = row['bowler']
         score = row['score']
-        date = row['date']
+        date = row['date'].strftime('%m-%d-%Y')
         game_num = row['game_num']
         
         game_id = f"{date}-{game_num}"
@@ -231,20 +232,24 @@ def print_games_index(data):
 
     file.write("</div>")
 
-    unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
+    unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1).sort_values(by=['date', 'game_num'])
     file.write("<p><i>Confidence intervals calculated using the standard error of the mean and a 95% confidence level (z-score of 1.96).</i></p>")
     file.write("<h2>Game History</h2>")
-    file.write("<div style=\"display: flex;\">")
+    file.write("<div style=\"display: flex; flex-wrap: wrap;\">")
     ld = ""
     for item in unique_combinations.iterrows():
         date = item[1].date.strftime('%m-%d-%Y')
         if (ld != date):
             if (ld != ""):
                 file.write("</div>")
-            file.write(f"<div style=\"margin: 5px;\"><h4>{date}</h4>")
+            file.write(f"<div style=\"margin: 5px; min-width: max-content; padding: 5px;\"><h4>{date}</h4>")
         ld = date
         game_num = item[1].game_num
-        file.write(f"<a href=\"./{date}_{game_num}.html\">Game #{game_num}</a><br/>")
+        game_id = f"{date}-{game_num}"
+        winner = wins_count[game_id]['bowler']
+        if (winner == None):
+            winner = "tie"
+        file.write(f"<a href=\"./{date}_{game_num}.html\">Game #{game_num} ({winner})</a><br/>")
     file.write("</div></div>")
     file.write("<hr/>")
     file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Data current as of {datetime.now().strftime('%m-%d-%Y at %H:%M:%S')}</p>")
