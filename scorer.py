@@ -1,6 +1,7 @@
 import pandas as pd
 from scipy import stats
 from datetime import datetime
+import os
 
 
 def next_throw(row, i):
@@ -73,7 +74,6 @@ def count_wins(dataframe):
     bowlers_wins = {}
 
     for bowler in dataframe['bowler'].unique():
-        print(bowler)
         bowlers_wins[bowler] = 0
 
     for game_id in wins_count:
@@ -86,8 +86,8 @@ def count_wins(dataframe):
 
     return bw_df
 
-def print_game(date, game_num, full_data):
-    file = open(f"{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
+def print_game(date, game_num, full_data, file):
+    file = open(f"{file}/{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
     data = full_data[full_data['date'] == date]
     data = data[data['game_num'] == game_num]
     data = data.sort_values(by=['bowler'])
@@ -113,7 +113,6 @@ def print_game(date, game_num, full_data):
 
                 first_throw = row[frame_idx]
                 second_throw = row[frame_idx + 1]
-                print(bowler_name + " frame " + str(frame_number));
                 first_throw = score_of(first_throw)
                 if (first_throw == 10):
                     # Strike
@@ -183,8 +182,8 @@ def print_games_index(data):
 
     file.write("<div style=\"display: flex\">")
 
-def print_games_index(data):
-    file = open(f"index.html", "w")
+def print_games_index(data, file):
+    file = open(f"{file}/index.html", "w")
 
     file.write("<body>")
     file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
@@ -224,7 +223,6 @@ def print_games_index(data):
 
     def get_spares(df):
         lowest_scores = df.groupby('bowler')['spare_cnt'].sum().astype(int).reset_index()
-        print(lowest_scores.head())
         return lowest_scores.sort_values(by='spare_cnt', ascending=False)
     file.write(make_table("Most Spares", data, get_spares))
     
@@ -258,13 +256,27 @@ def print_games_index(data):
     file.write("</body>")
     file.close()
 
-data = pd.read_csv("data.csv")
-data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
-unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
-
-for item in unique_combinations.iterrows():
-    print_game(item[1].date, item[1].game_num, data)
-
-print_games_index(data)
+index_file = open(f"index.html", "w")
+index_file.write("<body>")
+index_file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
+index_file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
+for file in os.listdir('.'):
+    if file.endswith(".csv"):
+        wins_count = {}
+        dirname = file.replace(".csv", "")
+        index_file.write(f"<p><a href=\"{dirname}/index.html\">{dirname}</a></p>")
+        print(dirname)
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+        data = pd.read_csv(file)
+        data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
+        unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
+        
+        for item in unique_combinations.iterrows():
+            print_game(item[1].date, item[1].game_num, data, dirname)
+        
+        print_games_index(data, dirname)
+index_file.write("</body>")
+index_file.close()
 
 
