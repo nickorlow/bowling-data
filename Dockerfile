@@ -5,7 +5,7 @@ COPY . .
 RUN pip install -r requirements.txt 
 RUN python3 scorer.py
 RUN mkdir out 
-RUN cp * ./out/
+RUN cp -r * ./out/
 
 #FROM ghcr.io/nickorlow/anthracite:0.2.1
 #COPY --from=build-env /site/out/ /www/
