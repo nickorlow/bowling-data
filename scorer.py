@@ -87,7 +87,7 @@ def count_wins(dataframe):
     return bw_df
 
 def print_game(date, game_num, full_data, file):
-    file = open(f"{file}/{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
+    file = open(f"gen-html/{file}/{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
     data = full_data[full_data['date'] == date]
     data = data[data['game_num'] == game_num]
     data = data.sort_values(by=['bowler'])
@@ -173,17 +173,8 @@ def print_game(date, game_num, full_data, file):
     </style>""")
     file.close()
 
-def print_games_index(data):
-    file = open(f"index.html", "w")
-
-    file.write("<body>")
-    file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
-    file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
-
-    file.write("<div style=\"display: flex\">")
-
 def print_games_index(data, file):
-    file = open(f"{file}/index.html", "w")
+    file = open(f"gen-html/{file}/index.html", "w")
 
     file.write("<body>")
     file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
@@ -256,7 +247,9 @@ def print_games_index(data, file):
     file.write("</body>")
     file.close()
 
-index_file = open(f"index.html", "w")
+if not os.path.exists("gen-html"):
+    os.mkdir("gen-html")
+index_file = open(f"./gen-html/index.html", "w")
 index_file.write("<body>")
 index_file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
 index_file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
@@ -266,8 +259,8 @@ for file in os.listdir('.'):
         dirname = file.replace(".csv", "")
         index_file.write(f"<p><a href=\"{dirname}/index.html\">{dirname}</a></p>")
         print(dirname)
-        if not os.path.exists(dirname):
-            os.mkdir(dirname)
+        if not os.path.exists("gen-html/"+dirname):
+            os.mkdir("gen-html/"+dirname)
         data = pd.read_csv(file)
         data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
         unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
