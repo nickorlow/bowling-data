@@ -296,6 +296,7 @@ index_file.write("<hr/>")
 index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Data current as of {datetime.now().strftime('%m-%d-%Y at %H:%M:%S')}</p>")
 index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Hosted on <a href=\"https://nws.nickorlow.com\">NWS</a></p>")
 index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Powered by <a href=\"https://github.com/nickorlow/anthracite\">Anthracite Web Server</a></p>")
+index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Read the BART rules <a href=\"rules.html\">here</a></p>")
 index_file.write("</body>")
 index_file.close()
 
