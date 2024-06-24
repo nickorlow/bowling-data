@@ -5,9 +5,10 @@ COPY . .
 RUN pip install -r requirements.txt 
 RUN python3 scorer.py
 RUN mkdir out 
+RUN cp rules.html ./gen-html/
 RUN cp -r ./gen-html/* ./out/
 
-#FROM ghcr.io/nickorlow/anthracite:0.2.1
-#COPY --from=build-env /site/out/ /www/
-FROM nginx:alpine
+FROM ghcr.io/nickorlow/anthracite:0.2.1
+COPY --from=build-env /site/out/ /www/
+#FROM nginx:alpine
 COPY --from=build-env /site/out/ /usr/share/nginx/html

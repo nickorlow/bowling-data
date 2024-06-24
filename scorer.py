@@ -253,11 +253,19 @@ index_file = open(f"./gen-html/index.html", "w")
 index_file.write("<body>")
 index_file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
 index_file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
-for file in os.listdir('.'):
+all_dfs = []
+
+files = {
+        "UT Austin - Spring 2024 (Austin, TX)": "utexas-spring2024.csv",
+        "Susquehanna - Summer 2024 (Philadelphia, PA)": "susquehanna-summer2024.csv",
+        "Unattached Bowling Records": "misc.csv"
+        }
+
+for (name, file) in files.items():
     if file.endswith(".csv"):
         wins_count = {}
         dirname = file.replace(".csv", "")
-        index_file.write(f"<p><a href=\"{dirname}/index.html\">{dirname}</a></p>")
+        index_file.write(f"<p><a href=\"{dirname}/index.html\">{name}</a></p>")
         print(dirname)
         if not os.path.exists("gen-html/"+dirname):
             os.mkdir("gen-html/"+dirname)
@@ -269,6 +277,25 @@ for file in os.listdir('.'):
             print_game(item[1].date, item[1].game_num, data, dirname)
         
         print_games_index(data, dirname)
+        all_dfs.append(data)
+
+if not os.path.exists("gen-html/combined"):
+    os.mkdir("gen-html/combined")
+data = pd.concat(all_dfs, axis=0, ignore_index = True)
+data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
+
+unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
+
+for item in unique_combinations.iterrows():
+    print_game(item[1].date, item[1].game_num, data, "combined")
+
+print_games_index(data, "combined")
+
+index_file.write(f"<p><a href=\"combined/index.html\">Combined Results from All Seasons</a></p>")
+index_file.write("<hr/>")
+index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Data current as of {datetime.now().strftime('%m-%d-%Y at %H:%M:%S')}</p>")
+index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Hosted on <a href=\"https://nws.nickorlow.com\">NWS</a></p>")
+index_file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Powered by <a href=\"https://github.com/nickorlow/anthracite\">Anthracite Web Server</a></p>")
 index_file.write("</body>")
 index_file.close()
 
