@@ -91,7 +91,7 @@ def print_game(date, game_num, full_data, file):
     data = full_data[full_data['date'] == date]
     data = data[data['game_num'] == game_num]
     data = data.sort_values(by=['bowler'])
-    file.write(f"<h1>Game #{game_num} on {date}</h1>")
+    file.write(f"<h1>Game #{game_num} on {date.strftime('%m-%d-%Y')} at {data.iloc[0]['location']}</h1>")
     file.write("<table>")
     for i, row in data.iterrows():
         file.write("<tr>")
@@ -201,7 +201,39 @@ def print_games_index(data, file):
     
     file.write(make_table("Ranking (Avg score of last 8 games)", data, get_rankings))
 
+    def get_head_to_head_wins(df):
+        # Get unique bowlers
+        bowlers = df['bowler'].unique()
+        
+        # Create an empty dataframe for results
+        result_df = pd.DataFrame(0, index=bowlers, columns=['Bowler'] + list(bowlers))
+        
+        # Fill the 'Bowler' column with the index (bowler names)
+        result_df['Bowler'] = result_df.index
+        
+        # Group the dataframe by date and game_num
+        grouped = df.groupby(['date', 'game_num'])
+        
+        # Iterate through each game
+        for _, game_df in grouped:
+            # Get bowlers and scores for this game
+            game_results = game_df.set_index('bowler')['score']
+            
+            # Compare each pair of bowlers
+            for bowler1 in game_results.index:
+                for bowler2 in game_results.index:
+                    if bowler1 != bowler2:
+                        if game_results[bowler1] > game_results[bowler2]:
+                            result_df.loc[bowler1, bowler2] += 1
+                        elif game_results[bowler1] < game_results[bowler2]:
+                            result_df.loc[bowler1, bowler2] -= 1
+        
+        return result_df
 
+
+    def get_average_scores(df):
+        highest_scores = df.groupby('bowler')['score'].mean().reset_index()
+        return highest_scores.sort_values(by='score', ascending=False)
     def get_highest_scores(df):
         highest_scores = df.groupby('bowler')['score'].max().reset_index()
         return highest_scores.sort_values(by='score', ascending=False)
@@ -218,6 +250,11 @@ def print_games_index(data, file):
     file.write(make_table("Most Spares", data, get_spares))
     
     file.write(make_table("Most Wins", data, count_wins))
+    file.write(make_table("Average Score", data, get_average_scores))
+
+    file.write("</div>")
+    file.write("<div>")
+    file.write(make_table("Head to Head (bowlers on left have net wins over bowlers on top)", data, get_head_to_head_wins))
 
     file.write("</div>")
 
