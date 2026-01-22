@@ -292,6 +292,7 @@ index_file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transi
 all_dfs = []
 
 files = {
+        "Susquehanna - Winter 2026 (Philadelphia, PA) (BOB League)": "susquehanna-summer2026.csv",
         "UT Austin - Spring 2024 (Austin, TX)": "utexas-spring2024.csv",
         "Susquehanna - Summer 2024 (Philadelphia, PA)": "susquehanna-summer2024.csv",
         "Unattached Bowling Records": "misc.csv"

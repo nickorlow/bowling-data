@@ -1,0 +1,13 @@
+bowler,date,location,game_num,throwdata_avail,score,strike_cnt,spare_cnt,foul_cnt,f1_t1,f1_t2,f2_t1,f2_t2,f3_t1,f3_t2,f4_t1,f4_t2,f5_t1,f5_t2,f6_t1,f6_t2,f7_t1,f7_t2,f8_t1,f8_t2,f9_t1,f9_t2,f10_t1,f10_t2,f10_t3,team
+richard,1-21-2026,luckystrikephila,1,TRUE,97,1,2,0,3,6,3,3,7,0,7,3,10,,8,0,6,1,0,8,0,1,7,3,3,susq_a
+rohan,1-21-2026,luckystrikephila,1,TRUE,99,1,1,0,6,4,10,,7,0,7,1,3,5,7,0,7,1,5,3,7,2,5,2,,susq_a
+michael,1-21-2026,luckystrikephila,1,TRUE,63,0,1,0,4,6,2,7,4,2,0,3,0,4,0,1,9,0,7,1,2,0,0,9,,susq_a
+nick,1-21-2026,luckystrikephila,1,TRUE,109,1,2,0,4,5,1,8,10,,6,2,5,,7,1,1,8,0,8,7,0,7,3,6,susq_a
+richard,1-21-2026,luckystrikephila,2,TRUE,102,1,2,0,0,8,7,0,5,4,10,,9,0,6,3,7,0,0,0,8,2,8,2,6,susq_a
+rohan,1-21-2026,luckystrikephila,2,TRUE,93,0,2,0,0,6,3,5,9,0,7,3,6,2,0,9,4,6,3,4,7,1,3,6,,susq_a
+michael,1-21-2026,luckystrikephila,2,TRUE,72,0,1,0,6,0,0,8,8,0,3,7,7,0,0,4,0,0,1,7,7,0,6,1,,susq_a
+nick,1-21-2026,luckystrikephila,2,TRUE,106,2,2,0,10,,3,3,7,3,3,3,0,3,6,0,10,,5,5,9,0,8,0,,susq_a
+richard,1-21-2026,luckystrikephila,3,TRUE,81,1,0,0,0,1,9,0,3,6,9,0,4,1,0,7,0,8,10,,9,0,0,5,,susq_a
+rohan,1-21-2026,luckystrikephila,3,TRUE,108,1,3,0,3,6,7,3,0,10,7,0,7,1,4,3,3,5,10,,7,0,9,1,8,susq_a
+michael,1-21-2026,luckystrikephila,3,TRUE,71,0,1,0,0,10,8,1,3,0,5,3,3,3,3,4,0,8,6,0,0,1,5,0,,susq_a
+nick,1-21-2026,luckystrikephila,3,TRUE,106,2,1,0,9,0,7,1,7,0,0,3,9,1,6,0,10,,10,,6,0,1,8,,susq_a

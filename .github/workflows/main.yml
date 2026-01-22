@@ -65,22 +65,3 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vnum.outputs.version_tag }}
             ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      # Wait for NWS to pickup data
-      - name: sleep-random
-        uses: 1itachi/sleep-random@v1.0.0
-        with:
-          minutes: 2
-
-      - name: Discord Webhook Notification
-        uses: Zmicier14/discord-webhook@v1.0.6
-        with:
-          webhookUrl:  ${{ secrets.DISCORD_WEBHOOK_URL }}
-          severity: info
-          description: BART has been updated with new data. https://bart.nickorlow.com
-          username: BART Bot
-          footer: "Bowling Analysis and Research Tool"
-          avatarUrl: https://raw.githubusercontent.com/nickorlow/bowling-data/main/.github/workflows/supp/bot-pfp.png
-          
-          
-          
