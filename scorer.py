@@ -6,7 +6,7 @@ import os
 
 def next_throw(row, i):
     i += 1
-    while (str(row[i]) == "nan"):
+    while (str(row.iloc[i]) == "nan"):
         i += 1
     return i
 
@@ -87,6 +87,7 @@ def count_wins(dataframe):
     return bw_df
 
 def print_game(date, game_num, full_data, file):
+    fname = file
     file = open(f"gen-html/{file}/{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
     data = full_data[full_data['date'] == date]
     data = data[data['game_num'] == game_num]
@@ -104,6 +105,8 @@ def print_game(date, game_num, full_data, file):
         game_num = row["game_num"]
         date = row["date"]
 
+        print(f"parsing {bowler_name}'s game for {game_num} on {date} in {fname}")
+
         file.write(f"<td>{bowler_name}</td>")
         if (row["throwdata_avail"]):
             for frame_idx in range(9, 28, 2):
@@ -111,8 +114,8 @@ def print_game(date, game_num, full_data, file):
                 first_throw = False
                 frame_number = int(((frame_idx - 9) / 2) + 1)
 
-                first_throw = row[frame_idx]
-                second_throw = row[frame_idx + 1]
+                first_throw = row.iloc[frame_idx]
+                second_throw = row.iloc[frame_idx + 1]
                 first_throw = score_of(first_throw)
                 if (first_throw == 10):
                     # Strike
@@ -121,24 +124,24 @@ def print_game(date, game_num, full_data, file):
                     strike_cnt += 1
                     next_throw_idx = next_throw(row, frame_idx)
                     sb = score;
-                    score += score_of(row[next_throw_idx])
+                    score += score_of(row.iloc[next_throw_idx])
                     if (frame_number == 10):
-                        if (score_of(row[next_throw_idx]) == 10):
+                        if (score_of(row.iloc[next_throw_idx]) == 10):
                             file.write(" X ")
                             strike_cnt += 1
                         else:
-                            file.write(f" {score_of(row[next_throw_idx])} ")
+                            file.write(f" {score_of(row.iloc[next_throw_idx])} ")
                     next_throw_idx = next_throw(row, next_throw_idx)
-                    score += score_of(row[next_throw_idx])
+                    score += score_of(row.iloc[next_throw_idx])
                     if (frame_number == 10):
-                        if (score_of(row[next_throw_idx]) == 10):
+                        if (score_of(row.iloc[next_throw_idx]) == 10):
                             file.write(" X ", end="")
                             strike_cnt += 1
-                        elif (sb == score - 10 and score_of(row[next_throw_idx]) != 0):
+                        elif (sb == score - 10 and score_of(row.iloc[next_throw_idx]) != 0):
                             file.write(" /")
                             spare_cnt += 1
                         else:
-                            file.write(f" {score_of(row[next_throw_idx])} ")
+                            file.write(f" {score_of(row.iloc[next_throw_idx])} ")
                 else:
                     second_throw = score_of(second_throw)
                     if ((first_throw + second_throw) == 10):
@@ -147,9 +150,9 @@ def print_game(date, game_num, full_data, file):
                         spare_cnt += 1
                         score += 10
                         next_throw_idx = next_throw(row, frame_idx + 1)
-                        score += score_of(row[next_throw_idx])
+                        score += score_of(row.iloc[next_throw_idx])
                         if (frame_number == 10):
-                            if (score_of(row[next_throw_idx]) == 10):
+                            if (score_of(row.iloc[next_throw_idx]) == 10):
                                 strike_cnt += 1
                     else:
                         file.write(f"{first_throw:>2} {second_throw:>2}")
@@ -292,7 +295,7 @@ index_file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transi
 all_dfs = []
 
 files = {
-        "Susquehanna - Winter 2026 (Philadelphia, PA) (BOB League)": "susquehanna-summer2026.csv",
+        "Susquehanna - Winter 2026 (Philadelphia, PA) (BOB League)": "susquehanna-winter2026.csv",
         "UT Austin - Spring 2024 (Austin, TX)": "utexas-spring2024.csv",
         "Susquehanna - Summer 2024 (Philadelphia, PA)": "susquehanna-summer2024.csv",
         "Unattached Bowling Records": "misc.csv"
