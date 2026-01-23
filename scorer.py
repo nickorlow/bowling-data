@@ -88,6 +88,7 @@ def count_wins(dataframe):
 
 def print_game(date, game_num, full_data, file):
     fname = file
+    errors = 0
     file = open(f"gen-html/{file}/{date.strftime('%m-%d-%Y')}_{game_num}.html", "w")
     data = full_data[full_data['date'] == date]
     data = data[data['game_num'] == game_num]
@@ -160,8 +161,17 @@ def print_game(date, game_num, full_data, file):
                 file.write(f"<br/>{score}")
                 frame_scores.append(score)
                 file.write("</td>")
+            if score != row["score"]:
+                print(f"error: actual score {score} doesn't match calculated score {row['score']}")
+                errors += 1
+            if strike_cnt != row["strike_cnt"]:
+                print(f"error: actual strikes {strike_cnt} doesn't match calculated strikes {row['strike_cnt']}")
+                errors += 1
+            if spare_cnt != row["spare_cnt"]:
+                print(f"error: actual spares {spare_cnt} doesn't match calculated spares {row['spare_cnt']}")
+                errors += 1
         else:
-            file.write("<td colspan=\"10\">No throw data availiable</td>")
+            file.write("<td colspan=\"10\">No throw data available</td>")
         file.write(f"<td><b>{row['score']}</b></td>")
         file.write("</tr>")
     file.write("</table>")
@@ -175,8 +185,10 @@ def print_game(date, game_num, full_data, file):
     }
     </style>""")
     file.close()
+    print(f"found {errors} errors while checking data")
+    return errors
 
-def print_games_index(data, file):
+def print_games_index(data, file, errors):
     file = open(f"gen-html/{file}/index.html", "w")
 
     file.write("<body>")
@@ -280,6 +292,10 @@ def print_games_index(data, file):
             winner = "tie"
         file.write(f"<a href=\"./{date}_{game_num}.html\">Game #{game_num} ({winner})</a><br/>")
     file.write("</div></div>")
+    if errors > 0:
+        file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px; color: red;\">({errors} errors found in data)</p>")
+    else:
+        file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Data is error free</p>")
     file.write("<hr/>")
     file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Data current as of {datetime.now().strftime('%m-%d-%Y at %H:%M:%S')}</p>")
     file.write(f"<p style=\"margin-bottom: 0px; margin-top: 0px;\">Powered by <a href=\"https://github.com/nickorlow/anthracite\">Anthracite Web Server</a></p>")
@@ -313,10 +329,11 @@ for (name, file) in files.items():
         data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
         unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
         
+        errors = 0
         for item in unique_combinations.iterrows():
-            print_game(item[1].date, item[1].game_num, data, dirname)
+            errors += print_game(item[1].date, item[1].game_num, data, dirname)
         
-        print_games_index(data, dirname)
+        print_games_index(data, dirname, errors)
         all_dfs.append(data)
 
 if not os.path.exists("gen-html/combined"):
@@ -325,11 +342,11 @@ data = pd.concat(all_dfs, axis=0, ignore_index = True)
 data['date'] = pd.to_datetime(data['date'], format='%m-%d-%Y')
 
 unique_combinations = data.groupby(['date', 'game_num']).size().reset_index().drop(0, axis=1)
-
+errors = 0
 for item in unique_combinations.iterrows():
-    print_game(item[1].date, item[1].game_num, data, "combined")
+    errors += print_game(item[1].date, item[1].game_num, data, "combined")
 
-print_games_index(data, "combined")
+print_games_index(data, "combined", errors)
 
 index_file.write(f"<p><a href=\"combined/index.html\">Combined Results from All Seasons</a></p>")
 index_file.write("<hr/>")

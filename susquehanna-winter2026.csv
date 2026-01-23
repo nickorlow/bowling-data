@@ -2,7 +2,7 @@ bowler,date,location,game_num,throwdata_avail,score,strike_cnt,spare_cnt,foul_cn
 richard,1-21-2026,luckystrikephila,1,TRUE,97,1,2,0,3,6,3,3,7,0,7,3,10,,8,0,6,1,0,8,0,1,7,3,3,susq_a
 rohan,1-21-2026,luckystrikephila,1,TRUE,99,1,1,0,6,4,10,,7,0,7,1,3,5,7,0,7,1,5,3,7,2,5,2,,susq_a
 michael,1-21-2026,luckystrikephila,1,TRUE,63,0,1,0,4,6,2,7,4,2,0,3,0,4,0,1,9,0,7,1,2,0,0,9,,susq_a
-nick,1-21-2026,luckystrikephila,1,TRUE,109,0,2,0,4,5,1,8,10,,6,2,5,5,7,1,1,8,0,8,7,0,7,3,6,susq_a
+nick,1-21-2026,luckystrikephila,1,TRUE,109,1,2,0,4,5,1,8,10,,6,2,5,5,7,1,1,8,0,8,7,0,7,3,6,susq_a
 richard,1-21-2026,luckystrikephila,2,TRUE,102,1,2,0,0,8,7,0,5,4,10,,9,0,6,3,7,0,0,0,8,2,8,2,6,susq_a
 rohan,1-21-2026,luckystrikephila,2,TRUE,93,0,2,0,0,6,3,5,9,0,7,3,6,2,0,9,4,6,3,4,7,1,3,6,,susq_a
 michael,1-21-2026,luckystrikephila,2,TRUE,72,0,1,0,6,0,0,8,8,0,3,7,7,0,0,4,0,0,1,7,7,0,6,1,,susq_a
