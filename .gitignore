@@ -1,1 +1,4 @@
 *.html
+.~lock.*
+.direnv/
+gen-html/
