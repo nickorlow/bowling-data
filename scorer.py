@@ -86,6 +86,115 @@ def count_wins(dataframe):
 
     return bw_df
 
+# Spare Expectation via Pinfall Tracking & Analysis
+def get_septa_df(full_data):
+    bowlers = []
+    first_throw = []
+    second_throw = []
+
+    all_throws_df = pd.DataFrame()
+
+    for i, row in data.iterrows():
+        bowler_name = row["bowler"]
+        if (row["throwdata_avail"]):
+            for frame_idx in range(1,10):
+                bowlers.append(bowler_name)
+                first_throw.append(row[f"f{frame_idx}_t1"])
+                second_throw.append(row[f"f{frame_idx}_t2"])
+            # Special case for frame 10, since we have 3 compile
+            # 1 - no spare, 2 throws treated as normal
+            # 2 - spare in first 2 throws, 3rd throw granted 
+            # 3 - strike in first throw, pins reset for 2nd, 3rd throw granted
+            #     if we get a second strike, pins will be reset
+
+            # We'll handle these cases as:
+            # 1 - treat normally
+            # 2 - 1st 2 throws treated normally, 3rd added as first throw
+            # 3 - new throw created per each strike 
+            t1 = row[f"f10_t1"]
+            t2 = row[f"f10_t2"]
+            t3 = row[f"f10_t3"]
+
+            # case 1/2
+            if (t1 != 10):
+                bowlers.append(bowler_name)
+                first_throw.append(t1)
+                second_throw.append(t2)
+            else:
+                # case 3
+                # first throw strike
+                bowlers.append(bowler_name)
+                first_throw.append(t1)
+                second_throw.append(0)
+
+                # second throw not strike
+                if (t2 != 10):
+                    bowlers.append(bowler_name)
+                    first_throw.append(t2)
+                    second_throw.append(t3)
+                else:
+                    # second throw not strike
+                    bowlers.append(bowler_name)
+                    first_throw.append(t2)
+                    second_throw.append(0)
+                    bowlers.append(bowler_name)
+                    first_throw.append(t3)
+                    second_throw.append(0)
+
+    all_throws_df["bowler"] = bowlers
+    all_throws_df["t1"] = first_throw
+    all_throws_df["t2"] = second_throw 
+
+    septa_df = pd.DataFrame()
+
+    bwlrs = list(set(all_throws_df["bowler"]))
+    bwlrs.append("Average")
+    septa_df["bowler"] = bwlrs
+
+    for t1_pins in range(0, 10):
+        pcts = []
+        all_hits = 0
+        all_cnt = 0
+        for bowler in septa_df["bowler"]:
+            if bowler == "Average":
+                continue
+            t1s = all_throws_df[all_throws_df["t1"] == t1_pins]
+            t1s = t1s[t1s["bowler"] == bowler]
+            if (len(t1s) == 0):
+                pcts.append("")
+                continue
+            num_spares = len(t1s[t1s['t2'] == (10-t1_pins)])
+            all_hits += num_spares
+            all_cnt += len(t1s)
+            pcts.append(f"{round(num_spares/len(t1s) * 100, 2)}% ({num_spares}/{len(t1s)})")
+        if all_cnt != 0:
+            pcts.append(f"{round(all_hits/all_cnt * 100, 2)}% ({all_hits}/{all_cnt})")
+        else:
+            pcts.append("")
+        septa_df[f"{t1_pins}_down"] = pcts 
+
+    pcts = []
+    all_hits = 0
+    all_cnt = 0
+    for bowler in septa_df["bowler"]:
+        if bowler == "Average":
+            continue
+        t1s = all_throws_df[all_throws_df["bowler"] == bowler]
+        t1strike = t1s[t1s["t1"] == t1_pins]
+        t1s = len(t1s)
+        t1strike = len(t1strike)
+        all_cnt += t1s
+        all_hits += t1strike
+        pcts.append(f"{round((t1strike/t1s) * 100, 2)}% ({t1strike}/{t1s})")
+    if all_cnt != 0:
+        pcts.append(f"{round(all_hits/all_cnt * 100, 2)}% ({all_hits}/{all_cnt})")
+    else:
+        pcts.append("")
+    septa_df["strike"] = pcts
+
+
+    return septa_df.sort_values(by=["bowler"])
+
 def print_game(date, game_num, full_data, file):
     fname = file
     errors = 0
@@ -266,6 +375,10 @@ def print_games_index(data, file, errors):
     
     file.write(make_table("Most Wins", data, count_wins))
     file.write(make_table("Average Score", data, get_average_scores))
+    
+    file.write("</div>")
+    file.write("<div>")
+    file.write(make_table("SEPTA (S(pare|trike) Expectation via Pinfall Tracking + Analysis)", data, get_septa_df))
 
     file.write("</div>")
     file.write("<div>")
