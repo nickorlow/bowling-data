@@ -180,7 +180,7 @@ def get_septa_df(full_data):
         if bowler == "Average":
             continue
         t1s = all_throws_df[all_throws_df["bowler"] == bowler]
-        t1strike = t1s[t1s["t1"] == t1_pins]
+        t1strike = t1s[t1s["t1"] == 10]
         t1s = len(t1s)
         t1strike = len(t1strike)
         all_cnt += t1s
