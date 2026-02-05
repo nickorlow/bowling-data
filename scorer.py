@@ -297,12 +297,24 @@ def print_game(date, game_num, full_data, file):
     print(f"found {errors} errors while checking data")
     return errors
 
-def print_games_index(data, file, errors):
-    file = open(f"gen-html/{file}/index.html", "w")
+def print_games_index(data, file_name, errors, team=""):
+    file = open(f"gen-html/{file_name}/index.html", "w")
 
     file.write("<body>")
     file.write("<h1 style=\"margin-bottom: 0px;\">BART - Bowling Analysis and Research Tool</h1>")
     file.write("<p style=\"margin-top: 0px;\"><i>Not the Bay Area Rapid Transit Authority</i></p>")
+    
+    if team == "":
+        teams = set(data['team'])
+        for iteam in teams:
+            team_fname = f"{file_name}_team__{iteam}"
+            if not os.path.exists("gen-html/"+team_fname):
+                os.mkdir(f"gen-html/{team_fname}")
+            wins_count = {}
+            print_games_index(data[data['team'] == iteam], team_fname, errors, iteam)
+            wins_count = {}
+
+            file.write(f"<a href=\"../{team_fname}/index.html\"><p style=\"margin-top: 1px;\">team {iteam}</p></a>")
 
     file.write("<div style=\"display: flex\">")
 
