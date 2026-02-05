@@ -378,7 +378,7 @@ def print_games_index(data, file, errors):
     
     file.write("</div>")
     file.write("<div>")
-    file.write(make_table("SEPTA (S(pare|trike) Expectation via Pinfall Tracking + Analysis)", data, get_septa_df))
+    file.write(make_table("Fill Rate", data, get_septa_df))
 
     file.write("</div>")
     file.write("<div>")
