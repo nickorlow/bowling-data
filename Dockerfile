@@ -4,7 +4,7 @@ WORKDIR /site
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt 
 COPY . .
-RUN ls backing-data/csv
+RUN mkdir gen-html
 RUN python3 src/main.py
 RUN mkdir out 
 RUN cp -r ./assets/* ./gen-html/
