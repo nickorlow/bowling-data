@@ -161,7 +161,7 @@ class Calculations:
             df.sort("bowler")
             .group_by("bowler")
             .agg(
-                ps.col("score").first().alias("high_score"),
+                ps.col("score").sort().first().alias("high_score"),
                 ps.col("score").top_k_by(k=8, by="date").mean().alias("avg_last_8"),
                 ps.col("score").top_k_by(k=8, by="date").count().alias("num_ranked_games"),
                 ps.col("score").mean().alias("avg_score").round(2),
