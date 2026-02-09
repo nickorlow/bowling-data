@@ -1,9 +1,11 @@
-FROM python:3.8-slim-buster as build-env
+FROM python:3.11-slim-buster as build-env
 
 WORKDIR /site
-COPY . .
+COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt 
-RUN python3 scorer.py
+COPY . .
+RUN ls backing-data/csv
+RUN python3 src/main.py
 RUN mkdir out 
 RUN cp -r ./assets/* ./gen-html/
 RUN cp -r ./gen-html/* ./out/

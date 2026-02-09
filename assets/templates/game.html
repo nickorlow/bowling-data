@@ -1,0 +1,28 @@
+{% import "table.html" as tbl %}
+
+<table>
+    {% for game in player_games %}
+    <tr>
+        <th>{{ game.bowler }} </th>         
+        {% for frame in game.frames %}
+            <td>
+                <p>
+                    {% for throw in frame %}
+                        {% if throw.strike %}
+                        X
+                        {% elif throw.spare %}
+                        /
+                        {% else %}
+                        {{ throw.pins_hit }}
+                        {% endif %}
+                        {% if loop.last %}
+                </p>
+                <p style="float:right;">{{ throw.score }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>

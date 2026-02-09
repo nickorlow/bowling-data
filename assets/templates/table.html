@@ -1,0 +1,41 @@
+{% macro table (title, df, subtitle=None, first_col_header=False, suffix=None, zero_is_null=False, style="") -%}
+<div style="padding: 5px;">
+<table class="sortable" style="{{ style }}">
+    <thead>
+    <tr>
+        <th class="no-sort" colspan="{{ df.columns|length }}">
+            <p>{{ title }}</p>
+            {% if subtitle %}
+            <p style="font-style: italic; font-weight: lighter; font-size: 0.7em;">{{ subtitle }}</p>
+            {% endif %}
+        </th>
+    </tr>
+        <tr>
+        {% for col in df.columns %}
+        <th>{{ col.replace("_", " ") }}</th>
+        {%  endfor  %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in df.iter_rows() %}
+        <tr>
+            {% for val in row %}
+                {%  if loop.first and first_col_header %}
+                    <th>{{ val }}</th>
+                {% else %}
+                    {% if suffix and (val or (val == 0 and not zero_is_null)) %}
+                        <td data-sort="{{ val }}">{{ val }} {{ suffix }}</td>
+                    {% elif val or (val == 0 and not zero_is_null)%}
+                    <td data-sort="{{ val }}">{{ val }}</td>
+                    {% else %}
+                        <td data-sort="0"></td>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{%- endmacro %}

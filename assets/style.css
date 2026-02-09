@@ -1,0 +1,38 @@
+* {
+  font-family: monospace; 
+}
+
+td {
+  text-align: center;
+}
+
+body {
+  background-color: #e3c7a8;//#bdefff;
+}
+
+a {
+  text-decoration: none;
+  color: #114488;
+}
+
+img {
+  max-width: 100%;
+}
+
+table, th, td {
+    border: 1px solid;
+    border-collapse: collapse;
+}
+
+th  {
+    font-weight: bold;
+    background-color: rgba(248,248,248,0.4);
+}
+
+td {
+    padding: 4px;
+}
+
+p  {
+    margin: 0;
+}

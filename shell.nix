@@ -7,6 +7,9 @@ pkgs.mkShell {
       python-pkgs.requests
       python-pkgs.numpy
       python-pkgs.scipy
+      python-pkgs.polars
+      python-pkgs.jinja2
+      python-pkgs.black
     ]))
   ];
 }

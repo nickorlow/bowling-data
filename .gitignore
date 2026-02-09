@@ -1,4 +1,4 @@
-*.html
 .~lock.*
 .direnv/
 gen-html/
+src/__pycache__/

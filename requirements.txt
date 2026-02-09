@@ -1,2 +1,6 @@
 pandas
+requests
+numpy
 scipy
+polars
+jinja2

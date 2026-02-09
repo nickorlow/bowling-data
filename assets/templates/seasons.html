@@ -1,0 +1,7 @@
+{% for data_file in data_files %}
+    <div style="margin: 10px;">
+        <a href="{{data_file[1]}}"><h3 style="font-weight: bold; margin: 0px;">{{data_file[0]}}</h3></a>
+        <p>{{ data_file[2]  }} bowlers | {{ data_file[3] }} records</p>
+        <p>{{ data_file[4]  }} - {{ data_file[5] }}</p>
+    </div>
+{% endfor %}

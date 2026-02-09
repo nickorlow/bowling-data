@@ -1,0 +1,26 @@
+{% import "sample_table.html" as stbl %}
+{% import "table.html" as tbl %}
+
+<div style="display: flex;">
+{{ tbl.table('Bowler Stats', personal_high_score_df) }}
+{{ tbl.table('High Scores', high_score_df) }}
+</div>
+<div style="display: flex; flex-wrap: wrap;">
+{{ tbl.table('Win Matrix', wins_df, '(bowlers on left have net wins over bowlers on top)', True) }}
+{{ stbl.sample_table('Pinfall Rates', pf_df, '% chance a first throw knocks down # of pins', first_col_header=True, suffix="%", zero_is_null=True) }}
+{{ stbl.sample_table('Fill Rates', fills_df, '% chance of a spare with # pins standing',  first_col_header=True, suffix="%") }}
+</div>
+<div style="display: flex; flex-wrap: wrap;">
+{% for date in game_dates %}
+    <div style="padding: 10px;">
+        <h4>{{  date.date }}</h4>
+        {% for game in date.games %}
+        <div style="margin-top: 3px;">
+            <a href="./{{ game['date'] }}__{{ game['game_num'] }}.html" }}"><p>game {{ game.game_num }}</p></a>
+                <p>winner: {{ game.winner }} </p>
+                <p>at: {{ game.location }} </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+</div>
