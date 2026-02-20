@@ -98,13 +98,38 @@ class Calculations:
 
         return ps.DataFrame({"t1": first_throw, "t2": second_throw, "bowler": bowlers})
 
+    def _calculate_average_row(self, long_format_df, group_col="t1"):
+        positives_df = long_format_df.group_by(group_col).agg(
+            ps.col("val").struct.field("positives").sum().cast(ps.UInt32).alias("positives"),
+        )
+        
+        sample_size_df = long_format_df.group_by([group_col, "bowler"]).agg(
+            ps.col("val").struct.field("sample_size").first().cast(ps.UInt32).alias("sample_size"),
+        ).group_by(group_col).agg(
+            ps.col("sample_size").sum().cast(ps.UInt32).alias("sample_size"),
+        )
+        
+        avg_df = positives_df.join(sample_size_df, on=group_col, how="inner")
+        
+        avg_df = avg_df.with_columns(
+            ps.struct(
+                ps.col("positives").alias("positives"),
+                ps.col("sample_size").alias("sample_size"),
+                (ps.col("positives")/ps.col("sample_size")*100).round(2).alias("pct")
+            ).alias("val")
+        ).with_columns(
+            ps.lit("average").alias("bowler")
+        ).select(["bowler", "val", group_col])
+        
+        return avg_df
+
     def get_pe_df(self, full_data):
         all_throws_df = self.frames_df 
 
         pe_df = (all_throws_df.with_columns().group_by(["t1","bowler"]).agg(
-                ps.col("t1").count().alias("hit_cnt"),
+                ps.col("t1").count().cast(ps.UInt32).alias("hit_cnt"),
             ))
-        pe_df2 = (all_throws_df.group_by("bowler").agg(ps.col("t1").count().alias("attempt_cnt")))
+        pe_df2 = (all_throws_df.group_by("bowler").agg(ps.col("t1").count().cast(ps.UInt32).alias("attempt_cnt")))
         pe_df = (pe_df.join(pe_df2, on="bowler", how="inner")
             .with_columns(
                 ps.struct(
@@ -113,8 +138,18 @@ class Calculations:
                     (ps.col("hit_cnt")/ps.col("attempt_cnt")*100).round(2).alias("pct")
                 ).alias("val")
             ).select(["bowler","val", "t1"]))
+        
+        avg_df = self._calculate_average_row(pe_df, group_col="t1")
+        
+        pe_df = ps.concat([pe_df, avg_df])
+        
         pe_df = pe_df.pivot("t1",index="bowler",values="val")
-        pe_df = pe_df.select(["bowler"] + [str(y) for y in sorted([int(x) for x in pe_df.columns[1:]])]).sort("bowler")
+        pe_df = pe_df.select(["bowler"] + [str(y) for y in sorted([int(x) for x in pe_df.columns[1:]])])
+        
+        avg_row = pe_df.filter(ps.col("bowler") == "average")
+        bowler_rows = pe_df.filter(ps.col("bowler") != "average").sort("bowler")
+        pe_df = ps.concat([bowler_rows, avg_row])
+        
         return pe_df
 
     def get_fill_rates(self, full_data):
@@ -132,8 +167,18 @@ class Calculations:
                     (ps.col("spare_cnt")/ps.col("attempt_cnt")*100).round(2).alias("pct")
                 ).alias("val")
             ).select(["bowler","val", "t1"]))
+        
+        avg_df = self._calculate_average_row(pe_df, group_col="t1")
+        
+        pe_df = ps.concat([pe_df, avg_df])
+        
         pe_df = pe_df.pivot("t1",index="bowler",values="val")
-        pe_df = pe_df.select(["bowler"]+sorted(pe_df.columns[1:])).sort("bowler")
+        pe_df = pe_df.select(["bowler"]+sorted(pe_df.columns[1:]))
+        
+        avg_row = pe_df.filter(ps.col("bowler") == "average")
+        bowler_rows = pe_df.filter(ps.col("bowler") != "average").sort("bowler")
+        pe_df = ps.concat([bowler_rows, avg_row])
+        
         return pe_df
 
     def get_individual_games(df) -> ps.DataFrame:
@@ -158,10 +203,10 @@ class Calculations:
     def get_bowler_stats(self, df) -> ps.DataFrame:
         win_counts = self.individual_games.group_by("winner").count()
         stats_df = (
-            df.sort("bowler")
+            df.sort("score")
             .group_by("bowler")
             .agg(
-                ps.col("score").first().alias("high_score"),
+                ps.col("score").last().alias("high_score"),
                 ps.col("score").top_k_by(k=8, by="date").mean().alias("avg_last_8"),
                 ps.col("score").top_k_by(k=8, by="date").count().alias("num_ranked_games"),
                 ps.col("score").mean().alias("avg_score").round(2),
@@ -171,6 +216,7 @@ class Calculations:
                 ps.col("score").top_k_by(k=8, by="date").std().alias("std"),
                 ps.col("score").count().alias("num_games"),
             )
+            .sort("bowler")
             .join(win_counts, how="left", left_on="bowler", right_on="winner")
             .rename({"count": "total_wins"})
             .with_columns(
