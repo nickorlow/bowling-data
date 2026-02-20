@@ -6,7 +6,7 @@
 {{ tbl.table('High Scores', high_score_df) }}
 </div>
 <div style="display: flex; flex-wrap: wrap;">
-{{ tbl.table('Win Matrix', wins_df, '(bowlers on left have net wins over bowlers on top)', True) }}
+{{ tbl.table('Win Matrix', wins_df, '(bowlers on top have net wins over bowlers on left)', True) }}
 {{ stbl.sample_table('Pinfall Rates', pf_df, '% chance a first throw knocks down # of pins', first_col_header=True, suffix="%", zero_is_null=True) }}
 {{ stbl.sample_table('Fill Rates', fills_df, '% chance of a spare with # pins standing',  first_col_header=True, suffix="%") }}
 </div>
