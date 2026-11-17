@@ -260,7 +260,8 @@ class Calculations:
                     "team",
                 ]
             )
-            .sort("avg_score", descending=True)
+            .sort("avg_last_8", descending=True)
+            .with_row_index("rank", 1)
         )
 
     def highest_scores(self) -> ps.DataFrame:

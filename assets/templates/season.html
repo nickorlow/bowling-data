@@ -2,7 +2,7 @@
 {% import "table.html" as tbl %}
 
 <div style="display: flex;">
-{{ tbl.table('Bowler Stats', personal_high_score_df) }}
+{{ tbl.table('Bowler Stats', personal_high_score_df, '(rank based on avg of last 8 games)') }}
 {{ tbl.table('High Scores', high_score_df) }}
 </div>
 <div style="display: flex; flex-wrap: wrap;">
